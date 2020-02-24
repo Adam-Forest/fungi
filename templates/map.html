@@ -5,18 +5,28 @@
       <title>IF Map</title>
 
 
-      <link rel="stylesheet" href="http://cdn.leafletjs.com/leaflet/v0.7.7/leaflet.css"/>
-      <script src="http://cdn.leafletjs.com/leaflet-0.7.3/leaflet.js"></script>
-      <script src="http://code.jquery.com/jquery-2.1.4.min.js"></script>
+  <!-- Leaflet JS & CSS -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.5.1/dist/leaflet.css"
+    crossorigin="" />
+  <script src="https://unpkg.com/leaflet@1.5.1/dist/leaflet.js"
+     crossorigin=""></script>
+  <script src="https://cdn.jsdelivr.net/npm/leaflet.locatecontrol/dist/L.Control.Locate.min.js"
+    charset="utf-8"></script>
       
 
       <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
       <link href="static/css/style.css" rel="stylesheet">
       
 
-<link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@0.5.0/dist/MarkerCluster.css" />
-<link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@0.5.0/dist/MarkerCluster.Default.css" />
-<script type="text/javascript" src="https://unpkg.com/leaflet.markercluster@0.5.0/dist/leaflet.markercluster.js"></script>
+  <!-- d3 JS -->
+  <script src="https://d3js.org/d3.v4.min.js"></script>
+
+  <!-- Marker Cluster JS & CSS -->
+  <script type="text/javascript"
+    src="https://unpkg.com/leaflet.markercluster@1.0.4/dist/leaflet.markercluster.js"></script>
+  <link rel="stylesheet" type="text/css" href="https://unpkg.com/leaflet.markercluster@1.0.4/dist/MarkerCluster.css">
+  <link rel="stylesheet" type="text/css"
+    href="https://unpkg.com/leaflet.markercluster@1.0.4/dist/MarkerCluster.Default.css">
    
       <style>
         #map{ height: 100% }
@@ -40,18 +50,43 @@
         }).addTo(map);  
 
 
-//Read geojson and bind popup
-        $.getJSON('/static/data.geojson', function(data) {
-          var geojson = L.geoJson(data, {
-            onEachFeature: function (feature, layer) {
-              layer.bindPopup('<b>' + feature.properties.type + '</b>' + '</br>' + "<img src='/static/images_thumbnail/" + feature.properties.map_image + "' class='thumb' height=175px width=175px />" + '</br>' + '<b>AKA: '+ feature.properties.aka + '</b>' + '</br>' + '<b>Finder: '+ feature.properties.finder + '</b>' + '</br>' + '<b>Near: ' + feature.properties.city + ", " + feature.properties.state + '</b>');              
-            },
-            pointToLayer: function (data, latlng) {
+var url = "/static/data.geojson"
+// Grab data with d3
+
+var markers = L.markerClusterGroup();
+
+// Grab the data with d3
+d3.json(url, function (response) {
+  console.log(response);
+  // Create a new marker cluster group
+
+  markers.addLayer(L.geoJson(response, {
+    pointToLayer: function (feature, latlng) {
               return L.marker(latlng);
-            }
-          }).addTo(map);
-          map.fitBounds(geojson.getBounds());
-        });
+      },
+    onEachFeature: function (feature, layer) {
+      layer.bindPopup('<b>' + feature.properties.type + '</b>' + '</br>' + "<img src='/static/images_thumbnail/" + feature.properties.map_image + "' class='thumb' height=175px width=175px />" + '</br>' + '<b>AKA: '+ feature.properties.aka + '</b>' + '</br>' + '<b>Finder: '+ feature.properties.finder + '</b>' + '</br>' + '<b>Near: ' + feature.properties.city + ", " + feature.properties.state + '</b>');    
+    }
+  }));
+
+  map.addLayer(markers);
+  map.fitBounds(geojson.getBounds());
+
+  
+});
+
+// //Read geojson and bind popup
+//         $.getJSON('/static/data.geojson', function(data) {
+//           var geojson = L.geoJson(data, {
+//             onEachFeature: function (feature, layer) {
+//               layer.bindPopup('<b>' + feature.properties.type + '</b>' + '</br>' + "<img src='/static/images_thumbnail/" + feature.properties.map_image + "' class='thumb' height=175px width=175px />" + '</br>' + '<b>AKA: '+ feature.properties.aka + '</b>' + '</br>' + '<b>Finder: '+ feature.properties.finder + '</b>' + '</br>' + '<b>Near: ' + feature.properties.city + ", " + feature.properties.state + '</b>');              
+//             },
+//             pointToLayer: function (data, latlng) {
+//               return L.marker(latlng);
+//             }
+//           }).addTo(map);
+//           map.fitBounds(geojson.getBounds());
+//         });
 
       
 </script>
